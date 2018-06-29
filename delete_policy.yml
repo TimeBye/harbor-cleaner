@@ -1,0 +1,42 @@
+# 仓库相关信息
+registry_url: https://registry.example.com/
+username: admin
+password: password
+
+# 仅模拟运行，不真实删除，默认启用
+dry_run: true
+# 删除以现在时间为基础以前的镜像，单位为小时，默认72
+interval_hour: 72
+# 忽略这个项目下所有镜像
+ignore_projects:
+# 项目删除策略
+projects:
+  # 是否删除空项目
+  delete_empty: false
+  # 需删除的关键字
+  include:
+    # 按关键字进行删除
+    keys:
+    # 按正则表达式删除
+    regex:
+  # 排除策略，删除策略与排除策略都匹配，以排除策略为准
+  exclude:
+    # 按关键字进行排除
+    keys:
+    # 按正则表达式排除
+    regex:
+
+# 镜像tag删除策略
+tags:
+  # 删除策略
+  include:
+    # 按关键字进行删除
+    keys: dev,test
+    # 按正则表达式删除
+    regex:
+  # 排除策略，删除策略与排除策略都匹配，以排除策略为准
+  exclude:
+    # 按关键字进行排除
+    keys:
+    # 按正则表达式排除
+    regex: latest|master|^[Vv]?(\d+(\.\d+){1,2})$
