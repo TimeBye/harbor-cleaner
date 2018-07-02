@@ -24,6 +24,8 @@ password: password
 dry_run: true
 # 删除以现在时间为基础以前的镜像，单位为小时，默认72
 interval_hour: 72
+# 至少保留镜像个数，默认10
+mix_count: 10
 # 忽略这个项目下所有镜像
 ignore_projects:
 # 项目删除策略

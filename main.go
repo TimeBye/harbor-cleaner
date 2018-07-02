@@ -12,6 +12,7 @@ import (
 	"strings"
 	"flag"
 	"os"
+	"sort"
 )
 
 const (
@@ -32,6 +33,7 @@ type DeletePolicy struct {
 	DryRun              bool          `json:"dry_run"`
 	IntervalHour        time.Duration `json:"interval_hour"`
 	IgnoreProjects      string        `json:"ignore_projects"`
+	MixCount            int           `json:"mix_count"`
 	IgnoreProjectsRegex string
 	Projects struct {
 		DeleteEmpty bool `json:"delete_empty"`
@@ -58,6 +60,18 @@ type DeletePolicy struct {
 			KeysRegex string
 		}
 	}
+}
+
+type TagSlice []harbor.TagResp
+
+func (tagSlice TagSlice) Len() int {
+	return len(tagSlice)
+}
+func (tagSlice TagSlice) Swap(i, j int) {
+	tagSlice[i], tagSlice[j] = tagSlice[j], tagSlice[i]
+}
+func (tagSlice TagSlice) Less(i, j int) bool {
+	return tagSlice[j].Created.Before(tagSlice[i].Created)
 }
 
 func checkErrs(errs []error, info string) {
@@ -142,9 +156,10 @@ func generateRegexByKeys(keys string) string {
 	return fmt.Sprintf(".*%s.*", strings.Replace(keys, ",", ".*|.*", -1))
 }
 
-func needDeleteTag(tag harbor.TagResp) bool {
+func needDeleteTag(tag harbor.TagResp, count *int) bool {
 	baseTime, _ := time.ParseDuration("1h")
-	if time.Now().Sub(tag.Created) < deletePolicy.IntervalHour*baseTime {
+	if time.Now().Sub(tag.Created) < deletePolicy.IntervalHour*baseTime || *count < 10 {
+		*count += 1
 		return false
 	}
 	match, err := regexp.MatchString(deletePolicy.Tags.Exclude.Regex, tag.Name)
@@ -215,9 +230,11 @@ func doDelete(statisticMap harbor.StatisticMap) {
 			repositories := getRepositories(project.ProjectID)
 			for _, repository := range repositories {
 				tags := getRepositoryTags(repository.Name)
+				sort.Sort(TagSlice(tags))
+				var count = 0
 				for _, tag := range tags {
-					if needDeleteTag(tag) {
-						glog.Infof("Untagged Image Tag: %s:%s", repository.Name, tag.Name)
+					if needDeleteTag(tag, &count) {
+						glog.Infof("Untagged: %s:%s", repository.Name, tag.Name)
 						if !deletePolicy.DryRun {
 							resp, errs := HClient.Repositories.DeleteRepositoryTag(repository.Name, tag.Name)
 							if errs != nil {
@@ -245,6 +262,7 @@ func readDeletePolicy() {
 	checkErr(err)
 	deletePolicy.DryRun = true
 	deletePolicy.IntervalHour = 72
+	deletePolicy.MixCount = 10
 	err = yaml.Unmarshal(data, &deletePolicy)
 	checkErr(err)
 	deletePolicy.Projects.Include.KeysRegex = generateRegexByKeys(deletePolicy.Projects.Include.Keys)
