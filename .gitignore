@@ -32,6 +32,6 @@ Session.vim
 *~
 # auto-generated tag files
 tags
-
+delete_policy.yml
 
 # End of https://www.gitignore.io/api/go,vim

@@ -158,7 +158,7 @@ func generateRegexByKeys(keys string) string {
 
 func needDeleteTag(tag harbor.TagResp, count *int) bool {
 	baseTime, _ := time.ParseDuration("1h")
-	if time.Now().Sub(tag.Created) < deletePolicy.IntervalHour*baseTime || *count < 10 {
+	if time.Now().Sub(tag.Created) < deletePolicy.IntervalHour*baseTime || *count < deletePolicy.MixCount {
 		*count += 1
 		return false
 	}
