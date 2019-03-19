@@ -79,7 +79,7 @@ Harbor从v1.7.0版本开始支持不停机进行[在线存储回收](https://git
 
 #### Harbor 1.7.0以前版本
 
-Harbor从v1.7.0以前版本进行存储回收时需要手动切断外部访问以达到`禁止对 docker registry 进行任何修改`的目的。回收镜像所占存储[参考文档](https://github.com/docker/docker.github.io/blob/master/registry/garbage-collection.md#about-garbage-collection)。
+Harbor v1.7.0以前版本进行存储回收时需要手动切断外部访问以达到`禁止对 docker registry 进行任何修改`的目的。回收镜像所占存储[参考文档](https://github.com/docker/docker.github.io/blob/master/registry/garbage-collection.md#about-garbage-collection)。
 
 - 切断外部访问入口
 - 进入到`registry`容器中执行存储回收命令
