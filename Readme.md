@@ -1,4 +1,13 @@
 # Harbor cleaner
+
+>  :warning:
+>
+>  harbor-cleaner 已被置为只读模式，并不再被维护.
+>
+>  替代本程序更好的实现为： **[registry-manager](https://github.com/TimeBye/registry-manager)**.
+>
+>  :warning:
+
 此程序调用Harbor API，按照`project`和`tag`名称中是否包含定义的关键字或匹配的正则表达式进行删除。此操作只进行软删除，不回收镜像实际所占物理存储。
 
 ⚠️ **警告** ⚠️ 如果`tag A`和`tag B`都指向同一个`image`，那么当你在删除`tag A`时，`tag B`也将被删除。
